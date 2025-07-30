@@ -29,6 +29,20 @@
 
     <script>
         const form = document.querySelector('#shorten-form')
+        const fetchShortEndedUrl = async () => {
+            const res = await fetch('/links')
+            const links = await res.json()
+            console.log(links)
+            const list = document.querySelector('#shortened-urls')
+            list.innerHTML = ''
+            for (const [shortCode, url] of Object.entries(links)) {
+                const li = document.createElement('li')
+                li.innerHTML = `<a href="${shortCode}" target = "_blank"  >
+                        ${window.location.origin}/${shortCode}
+                        </a> - ${url}`
+                list.appendChild(li)
+            }
+        }
         form.addEventListener('submit', async (e) => {
             e.preventDefault()
             const formData = new FormData(e.target)
@@ -37,6 +51,8 @@
 
             console.log(url, shortCode)
             e.target.reset()
+
+
             try {
                 const res = await fetch('/shorten', {
                     method: 'POST',
@@ -44,6 +60,7 @@
                     body: JSON.stringify({ url, shortCode })
                 })
                 if (res.ok) {
+                    fetchShortEndedUrl()
                     alert('form submitted successfully')
                 } else {
                     const errorMessage = res.text()
@@ -53,6 +70,7 @@
                 console.log(error)
             }
         })
+        fetchShortEndedUrl()
     </script>
 </body>
 

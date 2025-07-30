@@ -38,6 +38,18 @@ const server = createServer(async (req, res) => {
 
         } else if (req.url === '/style.css') {
             await serveFiles(res, readFile(path.join('public', 'style.css')), "text/css")
+        } else if (req.url === '/links') {
+            const links = await loadLink()
+            res.writeHead(200, { "Content-Type": "application/json" })
+            res.end(JSON.stringify(links))
+        } else {
+            const links = await loadLink()
+            const shortCode = req.url.slice(1)
+            console.log(req.url.slice(1))
+            if (links[shortCode]) {
+                res.writeHead(302, { location: links[shortCode] })
+                return res.end()
+            }
         }
     }
     if (req.method === 'POST' && req.url === '/shorten') {
